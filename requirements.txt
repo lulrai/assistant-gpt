@@ -1,9 +1,12 @@
 # core dependencies
 pyttsx3
 pyaudio
-TTS
 python-dotenv
 SpeechRecognition
-# voice recognition dependencies
+# speech recognition dependencies
 pocketsphinx
 whisper
+# text to speech dependencies
+TTS
+# commands dependencies
+revChatGPT
