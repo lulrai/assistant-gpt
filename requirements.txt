@@ -1,0 +1,9 @@
+# core dependencies
+pyttsx3
+pyaudio
+TTS
+python-dotenv
+SpeechRecognition
+# voice recognition dependencies
+pocketsphinx
+whisper
