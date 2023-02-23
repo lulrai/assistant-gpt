@@ -4,7 +4,7 @@ import os
 import threading
 import logging
 import speech_recognition as sr
-from utils.useful_funcs import bcolors
+from utils.useful_funcs import bcolors, silence
 
 logger = logging.getLogger(__name__)
 
@@ -83,12 +83,13 @@ class SpeechController:
             self.waiting_for_query.wait()
             try:
                 audio = self.recognizer.listen(self.microphone, phrase_time_limit=5)
-                # Requires Google Speech Recognition API key, otherwise, uses default 
+                # Requires Google Speech Recognition API key, otherwise, uses default
                 if self.recog_type == "google":
-                    if not os.environ.get("GOOGLE_API_KEY"):
-                        recognized_text = self.recognizer.recognize_google(audio)
-                    else:
-                        recognized_text = self.recognizer.recognize_google(audio, key=os.environ.get("GOOGLE_API_KEY"))
+                    with silence():
+                        if not os.environ.get("GOOGLE_API_KEY"):
+                            recognized_text = self.recognizer.recognize_google(audio)
+                        else:
+                            recognized_text = self.recognizer.recognize_google(audio, key=os.environ.get("GOOGLE_API_KEY"))
                 # Requires whisper library
                 elif self.recog_type == "whisper":
                     recognized_text =  self.recognizer.recognize_whisper(audio, language="english", model="medium.en")
