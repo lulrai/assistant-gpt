@@ -1,0 +1,15 @@
+{
+	"intents": [
+		"wit_chatgpt",
+		"wit_message",
+		"wit_time",
+		"wit_exit"
+	],
+	"entities": [
+		["timezone", ["free-text"]],
+		["message_info", ["free-text"]],
+		["message_target", ["free-text"]],
+		["message_content", ["free-text"]],
+		["gpt_question", ["free-text"]]
+	]
+}

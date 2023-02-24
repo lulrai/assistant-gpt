@@ -1,0 +1,104 @@
+{
+	"time": {
+		"intent": "wit_time",
+		"entities": [],
+		"traits": []
+	},
+	"current time": {
+		"intent": "wit_time",
+		"entities": [],
+		"traits": []
+	},
+	"date": {
+		"intent": "wit_date",
+		"entities": [],
+		"traits": []
+	},
+	"current date": {
+		"intent": "wit_date",
+		"entities": [],
+		"traits": []
+	},
+	"today's date": {
+		"intent": "wit_date",
+		"entities": [],
+		"traits": []
+	},
+	"current time in GMT+1": {
+		"intent": "wit_time",
+		"traits": [],
+		"entities": [{
+			"entity": "timezone:timezone",
+			"start": 16,
+			"end": 21,
+			"body": "GMT+1",
+			"entities": []
+		}]
+	},
+	"time in GMT+2": {
+		"intent": "wit_time",
+		"traits": [],
+		"entities": [{
+			"entity": "timezone:timezone",
+			"start": 8,
+			"end": 13,
+			"body": "GMT+2",
+			"entities": []
+		}]
+	},
+	"time in GMT+3": {
+		"intent": "wit_time",
+		"traits": [],
+		"entities": [{
+			"entity": "timezone:timezone",
+			"start": 8,
+			"end": 13,
+			"body": "GMT+3",
+			"entities": []
+		}]
+	},
+	"date in CST": {
+		"intent": "wit_date",
+		"traits": [],
+		"entities": [{
+			"entity": "timezone:timezone",
+			"start": 8,
+			"end": 11,
+			"body": "CST",
+			"entities": []
+		}]
+	},
+	"date in EST": {
+		"intent": "wit_date",
+		"traits": [],
+		"entities": [{
+			"entity": "timezone:timezone",
+			"start": 8,
+			"end": 11,
+			"body": "EST",
+			"entities": []
+		}]
+	},
+	"current time in PST": {
+		"intent": "wit_time",
+		"traits": [],
+		"entities": [{
+			"entity": "timezone:timezone",
+			"start": 16,
+			"end": 19,
+			"body": "PST",
+			"entities": []
+		}]
+	},
+	"current date in GMT-2": {
+		"intent": "wit_date",
+		"traits": [],
+		"entities": [{
+			"entity": "timezone:timezone",
+			"start": 16,
+			"end": 21,
+			"body": "GMT-2",
+			"entities": []
+		}]
+	}
+}

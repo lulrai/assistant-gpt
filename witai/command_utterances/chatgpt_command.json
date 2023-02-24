@@ -1,0 +1,357 @@
+{
+	"chat gpt how do I create a github account": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 41,
+			"body": "how do I create a github account",
+			"entities": []
+		}]
+	},
+	"chat gpt how can I improve my coding skills?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 44,
+			"body": "how can I improve my coding skills?",
+			"entities": []
+		}]
+	},
+	"chat gpt what are the best resources to learn Python?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 53,
+			"body": "what are the best resources to learn Python?",
+			"entities": []
+		}]
+	},
+	"chat gpt how do I set up a virtual environment in Python?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 57,
+			"body": "how do I set up a virtual environment in Python?",
+			"entities": []
+		}]
+	},
+	"chat gpt what are the common data structures used in programming?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 65,
+			"body": "what are the common data structures used in programming?",
+			"entities": []
+		}]
+	},
+	"chat gpt how can I optimize my code for better performance?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 59,
+			"body": "how can I optimize my code for better performance?",
+			"entities": []
+		}]
+	},
+	"Hey ChatGPT, can you help me with my Python code?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 13,
+			"end": 49,
+			"body": "help me with my Python code?",
+			"entities": []
+		}]
+	},
+	"What is the capital city of France, ChatGPT?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 0,
+			"end": 34,
+			"body": "What is the capital city of France",
+			"entities": []
+		}]
+	},
+	"ChatGPT, do you know how to bake a cake?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 40,
+			"body": "do you know how to bake a cake?",
+			"entities": []
+		}]
+	},
+	"Hi ChatGPT, what's the weather like today?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 12,
+			"end": 42,
+			"body": "what's the weather like today?",
+			"entities": []
+		}]
+	},
+	"ChatGPT, how can I improve my writing skills?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 45,
+			"body": "how can I improve my writing skills?",
+			"entities": []
+		}]
+	},
+	"What do you think about artificial intelligence, ChatGPT?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 0,
+			"end": 47,
+			"body": "What do you think about artificial intelligence",
+			"entities": []
+		}]
+	},
+	"Hey ChatGPT, what's the meaning of life?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 13,
+			"end": 40,
+			"body": "what's the meaning of life?",
+			"entities": []
+		}]
+	},
+	"ChatGPT, what's the best way to learn a new language?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 53,
+			"body": "what's the best way to learn a new language?",
+			"entities": []
+		}]
+	},
+	"ChatGPT, what are the best resources to learn Java?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 51,
+			"body": "what are the best resources to learn Java?",
+			"entities": []
+		}]
+	},
+	"What's your favorite programming language, ChatGPT?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 0,
+			"end": 41,
+			"body": "What's your favorite programming language",
+			"entities": []
+		}]
+	},
+	"What's the best way to learn a new language, ChatGPT?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 0,
+			"end": 43,
+			"body": "What's the best way to learn a new language",
+			"entities": []
+		}]
+	},
+	"How can I improve my writing skills, ChatGPT?": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 0,
+			"end": 35,
+			"body": "How can I improve my writing skills",
+			"entities": []
+		}]
+	},
+	"Ask how to open an issue github": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 4,
+			"end": 31,
+			"body": "how to open an issue github",
+			"entities": []
+		}]
+	},
+	"Github how to open issue": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 0,
+			"end": 24,
+			"body": "Github how to open issue",
+			"entities": []
+		}]
+	},
+	"Chat gpt how do you open discord": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 32,
+			"body": "how do you open discord",
+			"entities": []
+		}]
+	},
+	"chat gpt tell me a joke": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 9,
+			"end": 23,
+			"body": "tell me a joke",
+			"entities": []
+		}]
+	},
+	"ask": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": []
+	},
+	"Ask chat gpt": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": []
+	},
+	"Ask chatgpt": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": []
+	},
+	"Ask gpt": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": []
+	},
+	"Ask gpt question": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": []
+	},
+	"Ask how to open an issue on github": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 4,
+			"end": 34,
+			"body": "how to open an issue on github",
+			"entities": []
+		}]
+	},
+	"gpt how to create a new project in android studio": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 4,
+			"end": 49,
+			"body": "how to create a new project in android studio",
+			"entities": []
+		}]
+	},
+	"gpt how to create a new PR in github": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 4,
+			"end": 36,
+			"body": "how to create a new PR in github",
+			"entities": []
+		}]
+	},
+	"Ask how do you open an issue on github": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 4,
+			"end": 38,
+			"body": "how do you open an issue on github",
+			"entities": []
+		}]
+	},
+	"ask chatgpt how do i open an issue on github": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 12,
+			"end": 44,
+			"body": "how do i open an issue on github",
+			"entities": []
+		}]
+	},
+	"Ask how to open a discord account": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 4,
+			"end": 33,
+			"body": "how to open a discord account",
+			"entities": []
+		}]
+	},
+	"chatgpt what is the population of netherlands": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 8,
+			"end": 45,
+			"body": "what is the population of netherlands",
+			"entities": []
+		}]
+	},
+	"ask chatgpt how to import a library in python": {
+		"intent": "wit_chatgpt",
+		"traits": [],
+		"entities": [{
+			"entity": "gpt_question:gpt_question",
+			"start": 12,
+			"end": 45,
+			"body": "how to import a library in python",
+			"entities": []
+		}]
+	}
+}

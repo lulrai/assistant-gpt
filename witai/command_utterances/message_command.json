@@ -1,0 +1,136 @@
+{
+	"message baby hello when are you coming home": {
+		"intent": "wit_message",
+		"traits": [],
+		"entities": [{
+			"entity": "message_info:message_info",
+			"start": 8,
+			"end": 43,
+			"body": "baby hello when are you coming home",
+			"entities": [{
+					"entity": "message_target:message_target",
+					"start": 8,
+					"end": 12,
+					"body": "baby",
+					"entities": []
+				},
+				{
+					"entity": "message_content:message_content",
+					"start": 13,
+					"end": 43,
+					"body": "hello when are you coming home",
+					"entities": []
+				}
+			]
+		}]
+	},
+	"message mom can you call me back in 10 minutes": {
+		"intent": "wit_message",
+		"traits": [],
+		"entities": [{
+			"entity": "message_info:message_info",
+			"start": 8,
+			"end": 46,
+			"body": "mom can you call me back in 10 minutes",
+			"entities": [{
+					"entity": "message_target:message_target",
+					"start": 8,
+					"end": 11,
+					"body": "mom",
+					"entities": []
+				},
+				{
+					"entity": "message_content:message_content",
+					"start": 12,
+					"end": 46,
+					"body": "can you call me back in 10 minutes",
+					"entities": []
+				}
+			]
+		}]
+	},
+	"message can you tell me the time": {
+		"intent": "wit_message",
+		"traits": [],
+		"entities": [{
+			"entity": "message_info:message_info",
+			"start": 8,
+			"end": 32,
+			"body": "can you tell me the time",
+			"entities": [{
+				"entity": "message_content:message_content",
+				"start": 8,
+				"end": 32,
+				"body": "can you tell me the time",
+				"entities": []
+			}]
+		}]
+	},
+	"message can you set an alarm for 7am tomorrow": {
+		"intent": "wit_message",
+		"traits": [],
+		"entities": [{
+			"entity": "message_info:message_info",
+			"start": 8,
+			"end": 45,
+			"body": "can you set an alarm for 7am tomorrow",
+			"entities": [{
+				"entity": "message_content:message_content",
+				"start": 8,
+				"end": 45,
+				"body": "can you set an alarm for 7am tomorrow",
+				"entities": []
+			}]
+		}]
+	},
+	"text dad can you buy some eggs?": {
+		"intent": "wit_message",
+		"traits": [],
+		"entities": [{
+			"entity": "message_info:message_info",
+			"start": 5,
+			"end": 31,
+			"body": "dad can you buy some eggs?",
+			"entities": [{
+					"entity": "message_target:message_target",
+					"start": 5,
+					"end": 8,
+					"body": "dad",
+					"entities": []
+				},
+				{
+					"entity": "message_content:message_content",
+					"start": 9,
+					"end": 31,
+					"body": "can you buy some eggs?",
+					"entities": []
+				}
+			]
+		}]
+	},
+	"text babe are we going to dinner tomorrow?": {
+		"intent": "wit_message",
+		"traits": [],
+		"entities": [{
+			"entity": "message_info:message_info",
+			"start": 5,
+			"end": 37,
+			"body": "babe are we going to dinner tomorrow?",
+			"entities": [{
+					"entity": "message_target:message_target",
+					"start": 5,
+					"end": 9,
+					"body": "babe",
+					"entities": []
+				},
+				{
+					"entity": "message_content:message_content",
+					"start": 10,
+					"end": 37,
+					"body": "are we going to dinner tomorrow?",
+					"entities": []
+				}
+			]
+		}]
+	}
+}
