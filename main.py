@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # Create a new speech controller
     speech_controller = SpeechController(
-        tts_engine = tts_engine, recog_type = "google", command_handler = command_handler
+        tts_engine = tts_engine, recog_type = "wit", command_handler = command_handler
     )
 
     # Run the speech controller in the background

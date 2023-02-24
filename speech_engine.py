@@ -1,8 +1,12 @@
 """ Speech Engine Module for recognizing speech and converting it to text. """
+import json
 from queue import Queue
 import os
 import threading
+from typing import Union
+import requests
 import logging
+from datetime import datetime
 import speech_recognition as sr
 from utils.useful_funcs import bcolors, silence
 
@@ -20,7 +24,7 @@ class SpeechController:
                  ambient_duration: int = 5) -> None:
         self.tts_engine = tts_engine
         self.recognizer = sr.Recognizer()
-        self.microphone = sr.Microphone(sample_rate=16000)
+        self.microphone = sr.Microphone()
         self.recog_type: str = recog_type
         self.command_handler = command_handler
         self.stop_listening = None
@@ -36,6 +40,16 @@ class SpeechController:
             print(f"{bcolors.OKGREEN}Calibrated microphone.{bcolors.ENDC}\n")
         
         print(f"{bcolors.OKGREEN}Speech recognition initialized with {recog_type} engine.{bcolors.ENDC}\n")
+
+        # if recog_type == "wit":
+        #     if not os.environ.get("WIT_AI_KEY"):
+        #         raise ValueError("Wit.ai key not found in environment variables, please set WIT_AI_KEY or use different recognizer type.")
+        #     print(f"{bcolors.HEADER}Learning wit.ai intents and entities...{bcolors.ENDC}")
+        #     wit_learnt = self.command_handler.learn_wit()
+        #     if wit_learnt:
+        #         print(f"{bcolors.OKGREEN}Learned wit.ai intents and entities.{bcolors.ENDC}\n")
+        #     else:
+        #         print(f"{bcolors.FAIL}Failed to learn wit.ai intents and entities.{bcolors.ENDC}\n")
 
     def background_listen(self, recognizer, audio) -> None:
         """
@@ -83,6 +97,7 @@ class SpeechController:
             self.waiting_for_query.wait()
             try:
                 audio = self.recognizer.listen(self.microphone, phrase_time_limit=5)
+                recognized_text: Union[str, dict] = ""
                 # Requires Google Speech Recognition API key, otherwise, uses default
                 if self.recog_type == "google":
                     with silence():
@@ -97,9 +112,33 @@ class SpeechController:
                 elif self.recog_type == "sphinx":
                     recognized_text = self.recognizer.recognize_sphinx(audio, language="en-US")
                 elif self.recog_type == "wit":
-                    if not os.environ.get("WIT_AI_KEY"):
-                        raise ValueError("Wit.ai key not found in environment variables, please set WIT_AI_KEY or use different recognizer type.")
-                    recognized_text = self.recognizer.recognize_wit(audio, key=os.environ.get("WIT_AI_KEY"))
+                    # TODO: Remove show_all=True and print statements, only for debugging
+                    wav_data = audio.get_wav_data(
+                        convert_rate=None if audio.sample_rate >= 8000 else 8000,  # audio samples must be at least 8 kHz
+                        convert_width=2  # audio samples should be 16-bit
+                    )
+                    api_version = datetime.now().strftime("%Y%m%d")
+                    wit_url = f"https://api.wit.ai/speech?v={api_version}"
+                    headers = {'Authorization': f'Bearer {os.environ.get("WIT_AI_KEY")}', 'Content-Type': 'audio/wav'}
+                    try:
+                        with requests.post(wit_url, headers=headers, data=wav_data, timeout=30) as wit_response:
+                            temp_text = wit_response.content.decode("utf-8")
+                            decoder = json.JSONDecoder()
+                            while temp_text:
+                                value, new_start = decoder.raw_decode(temp_text)
+                                temp_text = temp_text[new_start:].strip()
+                                print(value)
+                                if value.get("is_final"):
+                                    recognized_text = value
+                                    break
+                            else:
+                                recognized_text = {}
+                    except requests.HTTPError as http_error:
+                        raise sr.RequestError(f"recognition connection failed: {http_error}")
+                    except requests.RequestException as request_exception:
+                        raise sr.RequestError(f"recognition connection failed: {request_exception}")
+                    if not recognized_text.get("text"):
+                        raise sr.UnknownValueError()
                 else:
                     recognized_text = "Invalid recognition type."
 
