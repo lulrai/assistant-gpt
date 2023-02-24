@@ -4,9 +4,9 @@ from queue import Queue
 import os
 import threading
 from typing import Union
-import requests
-import logging
 from datetime import datetime
+import logging
+import requests
 import speech_recognition as sr
 from utils.useful_funcs import bcolors, silence
 

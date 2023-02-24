@@ -8,13 +8,13 @@ class MessageCommand(Command):
     """ This class is the command to send a message. """
     def __init__(self) -> None:
         self.command_aliases = ['message', 'text', 'sms', 'send']
-        super().__init__(command_aliases = self.command_aliases, requires_args = True)
+        super().__init__(command_aliases = self.command_aliases, intent="wit_message", requires_args = True)
         self.possible_numbers = {
             "default": "+xxxxxxxxxxx",
             "example": "+xxxxxxxxxxx"
         }
 
-    def execute_command(self, args) -> str:
+    def execute_string_command(self, args) -> str:
         """ This method executes the command and returns the message. """
         if platform != "darwin":
             return "This command is only available on macOS."
@@ -38,6 +38,12 @@ class MessageCommand(Command):
         else:
             response_message = "Could not send message!"
         return response_message
+
+    # TODO: Implement this
+    def execute_intent_command(self, args) -> str:
+        if platform != "darwin":
+            return "This command is only available on macOS."
+        pass
 
     def generate_applescript(self, target_number: str, message: str) -> str:
         """ This method generates the AppleScript to send a message. """
