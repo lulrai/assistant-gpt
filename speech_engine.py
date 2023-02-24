@@ -41,15 +41,15 @@ class SpeechController:
         
         print(f"{bcolors.OKGREEN}Speech recognition initialized with {recog_type} engine.{bcolors.ENDC}\n")
 
-        # if recog_type == "wit":
-        #     if not os.environ.get("WIT_AI_KEY"):
-        #         raise ValueError("Wit.ai key not found in environment variables, please set WIT_AI_KEY or use different recognizer type.")
-        #     print(f"{bcolors.HEADER}Learning wit.ai intents and entities...{bcolors.ENDC}")
-        #     wit_learnt = self.command_handler.learn_wit()
-        #     if wit_learnt:
-        #         print(f"{bcolors.OKGREEN}Learned wit.ai intents and entities.{bcolors.ENDC}\n")
-        #     else:
-        #         print(f"{bcolors.FAIL}Failed to learn wit.ai intents and entities.{bcolors.ENDC}\n")
+        if recog_type == "wit":
+            if not os.environ.get("WIT_AI_KEY"):
+                raise ValueError("Wit.ai key not found in environment variables, please set WIT_AI_KEY or use different recognizer type.")
+            print(f"{bcolors.HEADER}Learning wit.ai pre-defined utterances...{bcolors.ENDC}")
+            wit_learnt = self.command_handler.learn_wit()
+            if wit_learnt:
+                print(f"{bcolors.OKGREEN}Learned wit.ai pre-defined utterances.{bcolors.ENDC}\n")
+            else:
+                print(f"{bcolors.FAIL}Failed to learn wit.ai pre-defined utterances.{bcolors.ENDC}\n")
 
     def background_listen(self, recognizer, audio) -> None:
         """

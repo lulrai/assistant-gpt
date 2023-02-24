@@ -87,7 +87,7 @@ class CommandHandler:
             if timer_thread:
                 timer_thread.cancel()
             sys.exit()
-    
+
     def __handle_intent_command(self, command_response: dict, timer_thread: threading.Thread) -> str:
         """ Handles the command if it is an intent command. """
         entities = command_response["entities"]
@@ -112,31 +112,72 @@ class CommandHandler:
 
 
     def learn_wit(self) -> bool:
+        """ Learns wit.ai intents and utterances. """
+        # Get the most recent version of the API
         api_version = datetime.now().strftime("%Y%m%d")
-        url = f"https://api.wit.ai/utterances?v={api_version}"
-        # make a post request to wit.ai to learn the command
+
+        # URLs for all the requests
+        utterance_url = f"https://api.wit.ai/utterances?v={api_version}"
+        intent_url = f"https://api.wit.ai/intents?v={api_version}"
+        entity_url = f"https://api.wit.ai/entities?v={api_version}"
+
+        # headers for all the requests
         headers = {'Authorization': f'Bearer {os.environ.get("WIT_AI_KEY")}', 'Content-Type': 'application/json'}
 
-        commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "commands", "command_utterances")
-        if not os.path.exists(commands_dir):
+        # Directory where all the command utterances are stored
+        witai_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "witai")
+        if not os.path.exists(witai_dir):
+            print(f"{bcolors.FAIL}witai directory does not exist.{bcolors.ENDC}")
             return False
-        for filename in os.listdir(commands_dir):
-            if filename.endswith(".json"):
-                with open(os.path.join(commands_dir, filename), "w", encoding="utf-8") as utterance_file:
-                    utterances = json.load(utterance_file)
-                    for utterance in utterances:
-                        if utterance.get("done") is None:
-                            data = {
-                                "text": utterance["text"],
-                                "intent": utterance["intent"],
-                                "entities": utterance["entities"],
-                            }
-                            try:
-                                response = requests.post(url, headers=headers, data=json.dumps(data), timeout=5)
-                                if response.status_code != 201:
+
+        print(f"{bcolors.OKCYAN}Learning wit.ai intents and entities...{bcolors.ENDC}")
+        # Create a requests session
+        with requests.Session() as session:
+            # POST all the intents and entities
+            with open(os.path.join(witai_dir, "intent_entity_setup.json"), "r", encoding="utf-8") as setup_file:
+                setup = json.load(setup_file)
+
+                # POST intents
+                for intent in setup["intents"]:
+                    data = { "name": intent }
+                    response = session.post(intent_url, headers=headers, data=json.dumps(data), timeout=5)
+                    if response.json().get("error") and "already exists" in response.json().get("error"):
+                        continue
+                    if response.status_code != 201 and response.status_code != 200:
+                        print(f"{bcolors.FAIL}Failed to learn wit.ai intent {intent}.{bcolors.ENDC}")
+                        return False
+
+                # POST entities
+                for entity in setup["entities"]:
+                    data = { "name": entity[0], "roles": [], "lookups": entity[1] }
+                    response = session.post(entity_url, headers=headers, data=json.dumps(data), timeout=5)
+                    if response.json().get("error") and "already exists" in response.json().get("error"):
+                        continue
+                    if response.status_code != 201 and response.status_code != 200:
+                        print(f"{bcolors.FAIL}Failed to learn wit.ai entity {entity[0]}.{bcolors.ENDC}")
+                        return False
+            print(f"{bcolors.OKBLUE}Done learning wit.ai intents and entities.{bcolors.ENDC}")
+            print(f"{bcolors.OKCYAN}Learning wit.ai command utterances...{bcolors.ENDC}")
+            # POST command utterances
+            for filename in os.listdir(os.path.join(witai_dir, "command_utterances")):
+                if filename.endswith(".json"):
+                    with open(os.path.join(witai_dir, "command_utterances", filename), "r+", encoding="utf-8") as utterance_file:
+                        utterances = json.load(utterance_file)
+                        for utterance_text, utterance_info in utterances.items():
+                            if utterance_info.get("done") is None:
+                                data = {
+                                    "text": utterance_text,
+                                    "intent": utterance_info["intent"],
+                                    "entities": utterance_info["entities"],
+                                }
+                                response = session.post(utterance_url, headers=headers, data=json.dumps(data), timeout=5)
+                                print(response.text)
+                                if response.status_code != 201 and response.status_code != 200:
+                                    print(f"{bcolors.FAIL}Failed to learn wit.ai utterance {utterance_text}.{bcolors.ENDC}")
                                     return False
-                            except requests.exceptions.Timeout:
-                                return False
-                            utterance["done"] = True
-                    json.dump(utterances, utterance_file, indent=4)
+                                utterance_info["done"] = True
+                        # utterance_file.seek(0)
+                        # json.dump(utterances, utterance_file, indent=4)
+                        # utterance_file.truncate()
+            print(f"{bcolors.OKBLUE}Done learning wit.ai command utterances.{bcolors.ENDC}")
         return True
