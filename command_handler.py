@@ -38,6 +38,7 @@ class CommandHandler:
                             if command_alias not in self.commands:
                                 self.commands[command_alias] = {}
                                 self.commands[command_alias]["requires_args"] = command_instance.arg_required()
+                                self.commands[command_alias]["intent_name"] = command_instance.get_intent()
                                 self.commands[command_alias]["string_command"] = command_instance.execute_string_command
                                 self.commands[command_alias]["intent_command"] = command_instance.execute_intent_command
                             else:
@@ -91,16 +92,18 @@ class CommandHandler:
     def __handle_intent_command(self, command_response: dict, timer_thread: threading.Thread) -> str:
         """ Handles the command if it is an intent command. """
         entities = command_response["entities"]
-        intent = command_response["intents"][0]['name']
-        returned_response = ""
-        
-        for _, command_info in self.commands.items():
-            if command_info.get("intent_command") == intent:
-                if command_info["requires_args"]:
-                    returned_response = command_info["intent_command"](entities)
-                else:
-                    returned_response = command_info["intent_command"]()
-                break
+        if command_response.get("intents"):
+            returned_response = ""
+        else:
+            intent = command_response["intents"][0]["name"]
+            returned_response = ""
+            for _, command_info in self.commands.items():
+                if command_info.get("intent_name") == intent:
+                    if command_info["requires_args"]:
+                        returned_response = command_info["intent_command"](entities)
+                    else:
+                        returned_response = command_info["intent_command"]()
+                    break
         if returned_response == "":
             returned_response = "Sorry, command not found."
         print(f"{bcolors.HEADER}Response:{bcolors.ENDC} {bcolors.OKGREEN}{returned_response}{bcolors.ENDC}")
@@ -143,7 +146,7 @@ class CommandHandler:
                     response = session.post(intent_url, headers=headers, data=json.dumps(data), timeout=5)
                     if response.json().get("error") and "already exists" in response.json().get("error"):
                         continue
-                    elif response.status_code != 201 and response.status_code != 200:
+                    elif response.status_code not in (200, 201):
                         print(f"{bcolors.FAIL}Failed to learn wit.ai intent {intent}.{bcolors.ENDC}")
                         return False
 
@@ -153,7 +156,7 @@ class CommandHandler:
                     response = session.post(entity_url, headers=headers, data=json.dumps(data), timeout=5)
                     if response.json().get("error") and "already exists" in response.json().get("error"):
                         continue
-                    elif response.status_code != 201 and response.status_code != 200:
+                    elif response.status_code not in (200, 201):
                         print(f"{bcolors.FAIL}Failed to learn wit.ai entity {entity[0]}.{bcolors.ENDC}")
                         return False
             print(f"{bcolors.OKBLUE}Done learning wit.ai intents and entities.{bcolors.ENDC}")
@@ -164,7 +167,7 @@ class CommandHandler:
                     with open(os.path.join(witai_dir, "command_utterances", filename), "r+", encoding="utf-8") as utterance_file:
                         utterances = json.load(utterance_file)
                         response = session.post(utterance_url, headers=headers, data=json.dumps(utterances), timeout=5)
-                        if response.status_code != 201 and response.status_code != 200:
+                        if response.status_code not in (200, 201):
                             print(f"{bcolors.FAIL}Failed to learn wit.ai utterance for {filename}.{bcolors.ENDC}")
                             return False
             print(f"{bcolors.OKBLUE}Done learning wit.ai command utterances.{bcolors.ENDC}")

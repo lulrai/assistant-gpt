@@ -24,7 +24,7 @@ class SpeechController:
                  ambient_duration: int = 5) -> None:
         self.tts_engine = tts_engine
         self.recognizer = sr.Recognizer()
-        self.microphone = sr.Microphone()
+        self.microphone = sr.Microphone(chunk_size=16000, sample_rate=16000)
         self.recog_type: str = recog_type
         self.command_handler = command_handler
         self.stop_listening = None
@@ -38,7 +38,7 @@ class SpeechController:
             print(f"{bcolors.HEADER}Calibrating microphone for {ambient_duration} seconds...{bcolors.ENDC}")
             self.recognizer.adjust_for_ambient_noise(source, duration=ambient_duration)
             print(f"{bcolors.OKGREEN}Calibrated microphone.{bcolors.ENDC}\n")
-        
+
         print(f"{bcolors.OKGREEN}Speech recognition initialized with {recog_type} engine.{bcolors.ENDC}\n")
 
         if recog_type == "wit":
@@ -64,7 +64,7 @@ class SpeechController:
         """
         if self.recognized_text_queue.empty() and not self.waiting_for_query.is_set():
             try:
-                recognized_text = recognizer.recognize_sphinx(audio, keyword_entries=[("hey computer", 0.2)]).lower()
+                recognized_text = recognizer.recognize_sphinx(audio, keyword_entries=[("hey computer", 0.1)]).lower()
                 unique_tokens = set(recognized_text.split(" "))
                 if "hey" in unique_tokens and "computer" in unique_tokens:
                     self.tts_engine.speak("Yes? What do you want?")
@@ -112,33 +112,15 @@ class SpeechController:
                 elif self.recog_type == "sphinx":
                     recognized_text = self.recognizer.recognize_sphinx(audio, language="en-US")
                 elif self.recog_type == "wit":
-                    # TODO: Remove show_all=True and print statements, only for debugging
                     wav_data = audio.get_wav_data(
                         convert_rate=None if audio.sample_rate >= 8000 else 8000,  # audio samples must be at least 8 kHz
-                        convert_width=2  # audio samples should be 16-bit
+                        # convert_width=2  # audio samples should be 16-bit
                     )
-                    api_version = datetime.now().strftime("%Y%m%d")
-                    wit_url = f"https://api.wit.ai/speech?v={api_version}"
-                    headers = {'Authorization': f'Bearer {os.environ.get("WIT_AI_KEY")}', 'Content-Type': 'audio/wav'}
-                    try:
-                        with requests.post(wit_url, headers=headers, data=wav_data, timeout=30) as wit_response:
-                            temp_text = wit_response.content.decode("utf-8")
-                            decoder = json.JSONDecoder()
-                            while temp_text:
-                                value, new_start = decoder.raw_decode(temp_text)
-                                temp_text = temp_text[new_start:].strip()
-                                print(value)
-                                if value.get("is_final"):
-                                    recognized_text = value
-                                    break
-                            else:
-                                recognized_text = {}
-                    except requests.HTTPError as http_error:
-                        raise sr.RequestError(f"recognition connection failed: {http_error}")
-                    except requests.RequestException as request_exception:
-                        raise sr.RequestError(f"recognition connection failed: {request_exception}")
-                    if not recognized_text.get("text"):
-                        raise sr.UnknownValueError()
+                    print("WAV data length: ", len(wav_data))
+                    print("Audio data: ", audio.sample_rate, audio.sample_width)
+                    with open("temp.wav", "wb") as wav_file:
+                        wav_file.write(wav_data)
+                    recognized_text = self.recognizer.recognize_wit(wav_data, key=os.environ.get("WIT_AI_KEY"), show_all=True)
                 else:
                     recognized_text = "Invalid recognition type."
 
