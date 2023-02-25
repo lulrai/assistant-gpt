@@ -30,38 +30,38 @@
 		"traits": []
 	},
 	{
-		"text": "current time in GMT+1",
+		"text": "current time in UTC+1",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
 			"entity": "timezone:timezone",
 			"start": 16,
 			"end": 21,
-			"body": "GMT+1",
+			"body": "UTC+1",
 			"entities": []
 		}]
 	},
 	{
-		"text": "time in GMT+2",
+		"text": "time in UTC+2",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
 			"entity": "timezone:timezone",
 			"start": 8,
 			"end": 13,
-			"body": "GMT+2",
+			"body": "UTC+2",
 			"entities": []
 		}]
 	},
 	{
-		"text": "time in GMT+3",
+		"text": "time in UTC+3",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
 			"entity": "timezone:timezone",
 			"start": 8,
 			"end": 13,
-			"body": "GMT+3",
+			"body": "UTC+3",
 			"entities": []
 		}]
 	},
@@ -102,14 +102,14 @@
 		}]
 	},
 	{
-		"text": "current date in GMT-2",
+		"text": "current date in UTC-2",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
 			"entity": "timezone:timezone",
 			"start": 16,
 			"end": 21,
-			"body": "GMT-2",
+			"body": "UTC-2",
 			"entities": []
 		}]
 	}
