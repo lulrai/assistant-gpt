@@ -1,12 +1,23 @@
-# core dependencies
+# ==================== CORE DEPENDENCIES ====================
 pyttsx3
 pyaudio
 python-dotenv
 SpeechRecognition
-# speech recognition dependencies
+# ------------------------------------------------------------
+# ==================== SPEECH RECOGNITION ====================
+# FOR POCKETSPHINX RECOGNITION:
 pocketsphinx
+# FOR WHITSPER RECOGNITION:
 whisper
-# text to speech dependencies
+# (If you want cuda, follow instruction in https://pytorch.org/get-started/locally/)
+torch
+torchvision
+torchaudio
+# ------------------------------------------------------------
+# ==================== TEXT TO SPEECH ====================
+# For AI based TTS
 TTS
-# commands dependencies
+# ------------------------------------------------------------
+# ==================== CHATBOT ====================
+# ChatGPT dependency
 revChatGPT
