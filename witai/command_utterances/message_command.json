@@ -1,5 +1,6 @@
-{
-	"message baby hello when are you coming home": {
+[
+	{
+		"text": "message baby hello when are you coming home",
 		"intent": "wit_message",
 		"traits": [],
 		"entities": [{
@@ -9,22 +10,23 @@
 			"body": "baby hello when are you coming home",
 			"entities": [{
 					"entity": "message_target:message_target",
-					"start": 8,
-					"end": 12,
+					"start": 0,
+					"end": 4,
 					"body": "baby",
 					"entities": []
 				},
 				{
 					"entity": "message_content:message_content",
-					"start": 13,
-					"end": 43,
+					"start": 5,
+					"end": 35,
 					"body": "hello when are you coming home",
 					"entities": []
 				}
 			]
 		}]
 	},
-	"message mom can you call me back in 10 minutes": {
+	{
+		"text": "message mom can you call me back in 10 minutes",
 		"intent": "wit_message",
 		"traits": [],
 		"entities": [{
@@ -34,22 +36,23 @@
 			"body": "mom can you call me back in 10 minutes",
 			"entities": [{
 					"entity": "message_target:message_target",
-					"start": 8,
-					"end": 11,
+					"start": 0,
+					"end": 3,
 					"body": "mom",
 					"entities": []
 				},
 				{
 					"entity": "message_content:message_content",
-					"start": 12,
-					"end": 46,
+					"start": 4,
+					"end": 38,
 					"body": "can you call me back in 10 minutes",
 					"entities": []
 				}
 			]
 		}]
 	},
-	"message can you tell me the time": {
+	{
+		"text": "message can you tell me the time",
 		"intent": "wit_message",
 		"traits": [],
 		"entities": [{
@@ -59,14 +62,15 @@
 			"body": "can you tell me the time",
 			"entities": [{
 				"entity": "message_content:message_content",
-				"start": 8,
-				"end": 32,
+				"start": 0,
+				"end": 24,
 				"body": "can you tell me the time",
 				"entities": []
 			}]
 		}]
 	},
-	"message can you set an alarm for 7am tomorrow": {
+	{
+		"text": "message can you set an alarm for 7am tomorrow",
 		"intent": "wit_message",
 		"traits": [],
 		"entities": [{
@@ -76,14 +80,15 @@
 			"body": "can you set an alarm for 7am tomorrow",
 			"entities": [{
 				"entity": "message_content:message_content",
-				"start": 8,
-				"end": 45,
+				"start": 0,
+				"end": 37,
 				"body": "can you set an alarm for 7am tomorrow",
 				"entities": []
 			}]
 		}]
 	},
-	"text dad can you buy some eggs?": {
+	{
+		"text": "text dad can you buy some eggs?",
 		"intent": "wit_message",
 		"traits": [],
 		"entities": [{
@@ -93,39 +98,40 @@
 			"body": "dad can you buy some eggs?",
 			"entities": [{
 					"entity": "message_target:message_target",
-					"start": 5,
-					"end": 8,
+					"start": 0,
+					"end": 3,
 					"body": "dad",
 					"entities": []
 				},
 				{
 					"entity": "message_content:message_content",
-					"start": 9,
-					"end": 31,
+					"start": 4,
+					"end": 26,
 					"body": "can you buy some eggs?",
 					"entities": []
 				}
 			]
 		}]
 	},
-	"text babe are we going to dinner tomorrow?": {
+	{
+		"text": "text babe are we going to dinner tomorrow?",
 		"intent": "wit_message",
 		"traits": [],
 		"entities": [{
 			"entity": "message_info:message_info",
 			"start": 5,
-			"end": 37,
+			"end": 42,
 			"body": "babe are we going to dinner tomorrow?",
 			"entities": [{
 					"entity": "message_target:message_target",
-					"start": 5,
-					"end": 9,
+					"start": 0,
+					"end": 4,
 					"body": "babe",
 					"entities": []
 				},
 				{
 					"entity": "message_content:message_content",
-					"start": 10,
+					"start": 5,
 					"end": 37,
 					"body": "are we going to dinner tomorrow?",
 					"entities": []
@@ -133,4 +139,4 @@
 			]
 		}]
 	}
-}
+]

@@ -1,77 +1,92 @@
-{
-	"goodbye": {
+[
+	{
+		"text": "goodbye",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"good bye": {
+	{
+		"text": "good bye",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"good night": {
+	{
+		"text": "good night",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"goodnight": {
+	{
+		"text": "goodnight",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"please exit": {
+	{
+		"text": "please exit",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"please quit": {
+	{
+		"text": "please quit",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"quit": {
+	{
+		"text": "quit",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"quit please": {
+	{
+		"text": "quit please",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"stop": {
+	{
+		"text": "stop",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"stop listening": {
+	{
+		"text": "stop listening",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"stop program": {
+	{
+		"text": "stop program",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"abra cadabra": {
+	{
+		"text": "abra cadabra",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"abracadabra": {
+	{
+		"text": "abracadabra",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"abra kadabra": {
+	{
+		"text": "abra kadabra",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	},
-	"abrakadabra": {
+	{
+		"text": "abrakadabra",
 		"intent": "wit_exit",
 		"entities": [],
 		"traits": []
 	}
-}
+]

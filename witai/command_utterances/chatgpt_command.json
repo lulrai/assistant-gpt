@@ -1,5 +1,6 @@
-{
-	"chat gpt how do I create a github account": {
+[
+	{
+		"text": "chat gpt how do I create a github account",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -10,7 +11,8 @@
 			"entities": []
 		}]
 	},
-	"chat gpt how can I improve my coding skills?": {
+	{
+		"text": "chat gpt how can I improve my coding skills?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -21,7 +23,8 @@
 			"entities": []
 		}]
 	},
-	"chat gpt what are the best resources to learn Python?": {
+	{
+		"text": "chat gpt what are the best resources to learn Python?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -32,7 +35,8 @@
 			"entities": []
 		}]
 	},
-	"chat gpt how do I set up a virtual environment in Python?": {
+	{
+		"text": "chat gpt how do I set up a virtual environment in Python?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -43,7 +47,8 @@
 			"entities": []
 		}]
 	},
-	"chat gpt what are the common data structures used in programming?": {
+	{
+		"text": "chat gpt what are the common data structures used in programming?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -54,7 +59,8 @@
 			"entities": []
 		}]
 	},
-	"chat gpt how can I optimize my code for better performance?": {
+	{
+		"text": "chat gpt how can I optimize my code for better performance?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -65,7 +71,8 @@
 			"entities": []
 		}]
 	},
-	"Hey ChatGPT, can you help me with my Python code?": {
+	{
+		"text": "Hey ChatGPT, can you help me with my Python code?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -76,7 +83,8 @@
 			"entities": []
 		}]
 	},
-	"What is the capital city of France, ChatGPT?": {
+	{
+		"text": "What is the capital city of France, ChatGPT?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -87,7 +95,8 @@
 			"entities": []
 		}]
 	},
-	"ChatGPT, do you know how to bake a cake?": {
+	{
+		"text": "ChatGPT, do you know how to bake a cake?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -98,7 +107,8 @@
 			"entities": []
 		}]
 	},
-	"Hi ChatGPT, what's the weather like today?": {
+	{
+		"text": "Hi ChatGPT, what's the weather like today?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -109,7 +119,8 @@
 			"entities": []
 		}]
 	},
-	"ChatGPT, how can I improve my writing skills?": {
+	{
+		"text": "ChatGPT, how can I improve my writing skills?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -120,7 +131,8 @@
 			"entities": []
 		}]
 	},
-	"What do you think about artificial intelligence, ChatGPT?": {
+	{
+		"text": "What do you think about artificial intelligence, ChatGPT?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -131,7 +143,8 @@
 			"entities": []
 		}]
 	},
-	"Hey ChatGPT, what's the meaning of life?": {
+	{
+		"text": "Hey ChatGPT, what's the meaning of life?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -142,7 +155,8 @@
 			"entities": []
 		}]
 	},
-	"ChatGPT, what's the best way to learn a new language?": {
+	{
+		"text": "ChatGPT, what's the best way to learn a new language?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -153,7 +167,8 @@
 			"entities": []
 		}]
 	},
-	"ChatGPT, what are the best resources to learn Java?": {
+	{
+		"text": "ChatGPT, what are the best resources to learn Java?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -164,7 +179,8 @@
 			"entities": []
 		}]
 	},
-	"What's your favorite programming language, ChatGPT?": {
+	{
+		"text": "What's your favorite programming language, ChatGPT?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -175,7 +191,8 @@
 			"entities": []
 		}]
 	},
-	"What's the best way to learn a new language, ChatGPT?": {
+	{
+		"text": "What's the best way to learn a new language, ChatGPT?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -186,7 +203,8 @@
 			"entities": []
 		}]
 	},
-	"How can I improve my writing skills, ChatGPT?": {
+	{
+		"text": "How can I improve my writing skills, ChatGPT?",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -197,7 +215,8 @@
 			"entities": []
 		}]
 	},
-	"Ask how to open an issue github": {
+	{
+		"text": "Ask how to open an issue github",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -208,7 +227,8 @@
 			"entities": []
 		}]
 	},
-	"Github how to open issue": {
+	{
+		"text": "Github how to open issue",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -219,7 +239,8 @@
 			"entities": []
 		}]
 	},
-	"Chat gpt how do you open discord": {
+	{
+		"text": "Chat gpt how do you open discord",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -230,7 +251,8 @@
 			"entities": []
 		}]
 	},
-	"chat gpt tell me a joke": {
+	{
+		"text": "chat gpt tell me a joke",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -241,32 +263,38 @@
 			"entities": []
 		}]
 	},
-	"ask": {
+	{
+		"text": "ask",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": []
 	},
-	"Ask chat gpt": {
+	{
+		"text": "Ask chat gpt",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": []
 	},
-	"Ask chatgpt": {
+	{
+		"text": "Ask chatgpt",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": []
 	},
-	"Ask gpt": {
+	{
+		"text": "Ask gpt",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": []
 	},
-	"Ask gpt question": {
+	{
+		"text": "Ask gpt question",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": []
 	},
-	"Ask how to open an issue on github": {
+	{
+		"text": "Ask how to open an issue on github",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -277,7 +305,8 @@
 			"entities": []
 		}]
 	},
-	"gpt how to create a new project in android studio": {
+	{
+		"text": "gpt how to create a new project in android studio",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -288,7 +317,8 @@
 			"entities": []
 		}]
 	},
-	"gpt how to create a new PR in github": {
+	{
+		"text": "gpt how to create a new PR in github",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -299,7 +329,8 @@
 			"entities": []
 		}]
 	},
-	"Ask how do you open an issue on github": {
+	{
+		"text": "Ask how do you open an issue on github",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -310,7 +341,8 @@
 			"entities": []
 		}]
 	},
-	"ask chatgpt how do i open an issue on github": {
+	{
+		"text": "ask chatgpt how do i open an issue on github",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -321,7 +353,8 @@
 			"entities": []
 		}]
 	},
-	"Ask how to open a discord account": {
+	{
+		"text": "Ask how to open a discord account",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -332,7 +365,8 @@
 			"entities": []
 		}]
 	},
-	"chatgpt what is the population of netherlands": {
+	{
+		"text": "chatgpt what is the population of netherlands",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -343,7 +377,8 @@
 			"entities": []
 		}]
 	},
-	"ask chatgpt how to import a library in python": {
+	{
+		"text": "ask chatgpt how to import a library in python",
 		"intent": "wit_chatgpt",
 		"traits": [],
 		"entities": [{
@@ -354,4 +389,4 @@
 			"entities": []
 		}]
 	}
-}
+]

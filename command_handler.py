@@ -143,7 +143,7 @@ class CommandHandler:
                     response = session.post(intent_url, headers=headers, data=json.dumps(data), timeout=5)
                     if response.json().get("error") and "already exists" in response.json().get("error"):
                         continue
-                    if response.status_code != 201 and response.status_code != 200:
+                    elif response.status_code != 201 and response.status_code != 200:
                         print(f"{bcolors.FAIL}Failed to learn wit.ai intent {intent}.{bcolors.ENDC}")
                         return False
 
@@ -153,7 +153,7 @@ class CommandHandler:
                     response = session.post(entity_url, headers=headers, data=json.dumps(data), timeout=5)
                     if response.json().get("error") and "already exists" in response.json().get("error"):
                         continue
-                    if response.status_code != 201 and response.status_code != 200:
+                    elif response.status_code != 201 and response.status_code != 200:
                         print(f"{bcolors.FAIL}Failed to learn wit.ai entity {entity[0]}.{bcolors.ENDC}")
                         return False
             print(f"{bcolors.OKBLUE}Done learning wit.ai intents and entities.{bcolors.ENDC}")
@@ -163,21 +163,9 @@ class CommandHandler:
                 if filename.endswith(".json"):
                     with open(os.path.join(witai_dir, "command_utterances", filename), "r+", encoding="utf-8") as utterance_file:
                         utterances = json.load(utterance_file)
-                        for utterance_text, utterance_info in utterances.items():
-                            if utterance_info.get("done") is None:
-                                data = {
-                                    "text": utterance_text,
-                                    "intent": utterance_info["intent"],
-                                    "entities": utterance_info["entities"],
-                                }
-                                response = session.post(utterance_url, headers=headers, data=json.dumps(data), timeout=5)
-                                print(response.text)
-                                if response.status_code != 201 and response.status_code != 200:
-                                    print(f"{bcolors.FAIL}Failed to learn wit.ai utterance {utterance_text}.{bcolors.ENDC}")
-                                    return False
-                                utterance_info["done"] = True
-                        # utterance_file.seek(0)
-                        # json.dump(utterances, utterance_file, indent=4)
-                        # utterance_file.truncate()
+                        response = session.post(utterance_url, headers=headers, data=json.dumps(utterances), timeout=5)
+                        if response.status_code != 201 and response.status_code != 200:
+                            print(f"{bcolors.FAIL}Failed to learn wit.ai utterance for {filename}.{bcolors.ENDC}")
+                            return False
             print(f"{bcolors.OKBLUE}Done learning wit.ai command utterances.{bcolors.ENDC}")
         return True

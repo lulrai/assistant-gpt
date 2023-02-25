@@ -1,30 +1,36 @@
-{
-	"time": {
+[
+	{
+		"text": "time",
 		"intent": "wit_time",
 		"entities": [],
 		"traits": []
 	},
-	"current time": {
+	{
+		"text": "current time",
 		"intent": "wit_time",
 		"entities": [],
 		"traits": []
 	},
-	"date": {
-		"intent": "wit_date",
+	{
+		"text": "date",
+		"intent": "wit_time",
 		"entities": [],
 		"traits": []
 	},
-	"current date": {
-		"intent": "wit_date",
+	{
+		"text": "current date",
+		"intent": "wit_time",
 		"entities": [],
 		"traits": []
 	},
-	"today's date": {
-		"intent": "wit_date",
+	{
+		"text": "today's date",
+		"intent": "wit_time",
 		"entities": [],
 		"traits": []
 	},
-	"current time in GMT+1": {
+	{
+		"text": "current time in GMT+1",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
@@ -35,7 +41,8 @@
 			"entities": []
 		}]
 	},
-	"time in GMT+2": {
+	{
+		"text": "time in GMT+2",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
@@ -46,7 +53,8 @@
 			"entities": []
 		}]
 	},
-	"time in GMT+3": {
+	{
+		"text": "time in GMT+3",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
@@ -57,8 +65,9 @@
 			"entities": []
 		}]
 	},
-	"date in CST": {
-		"intent": "wit_date",
+	{
+		"text": "date in CST",
+		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
 			"entity": "timezone:timezone",
@@ -68,8 +77,9 @@
 			"entities": []
 		}]
 	},
-	"date in EST": {
-		"intent": "wit_date",
+	{
+		"text": "date in EST",
+		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
 			"entity": "timezone:timezone",
@@ -79,7 +89,8 @@
 			"entities": []
 		}]
 	},
-	"current time in PST": {
+	{
+		"text": "current time in PST",
 		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
@@ -90,8 +101,9 @@
 			"entities": []
 		}]
 	},
-	"current date in GMT-2": {
-		"intent": "wit_date",
+	{
+		"text": "current date in GMT-2",
+		"intent": "wit_time",
 		"traits": [],
 		"entities": [{
 			"entity": "timezone:timezone",
@@ -101,4 +113,4 @@
 			"entities": []
 		}]
 	}
-}
+]
