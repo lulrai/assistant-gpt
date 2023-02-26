@@ -7,7 +7,7 @@ python-dotenv
 # FOR POCKETSPHINX RECOGNITION:
 pocketsphinx
 # FOR WHITSPER RECOGNITION:
-whisper
+openai-whisper
 # (If you want cuda, follow instruction in https://pytorch.org/get-started/locally/)
 torch
 torchvision
