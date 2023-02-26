@@ -77,11 +77,18 @@ Assistant GPT (APT) is a Python application that uses speech recognition to allo
 
 ### Built With
 
-The project was built with `Python >= 3.8`. All the dependencies are listed in ```requirements.txt``` file. Here are some:
+The project was built with `Python >= 3.8`. All the dependencies are listed below:
 
 - [![Conda][conda]][conda-url]
 - [![Python][python]][python-url]
 - [![Google][google]][google-url]
+- [![RevChatGPT][revchatgpt]](revchatgpt-url)
+- [![PyTorch][pytorch]](pytorch)
+- [![SpeechRecognition][speechrecog]](speechrecog-url)
+- [![Coqui-Ai-TTS][tts]](tts-url)
+- [![Open-Ai-Whisper][whisper]](whisper-url)
+- [![PocketSphinx][pocketsphinx]](pocketsphinx-url)
+- [![Wit.Ai][witai]](witai-url)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -181,6 +188,7 @@ Project Link: [https://github.com/lulrai/assistant-gpt](https://github.com/lulra
 ## Acknowledgments
 
 - [Img Shields](https://shields.io)
+- [List of All Image Shields](https://github.com/progfay/shields-with-icon)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -204,3 +212,17 @@ Project Link: [https://github.com/lulrai/assistant-gpt](https://github.com/lulra
 [python-url]: https://www.python.org
 [google]: https://img.shields.io/static/v1?style=for-the-badge&message=Google+Speech+Recognition&color=4285F4&logo=Google+Cloud&logoColor=FFFFFF&label=
 [google-url]: https://cloud.google.com/speech-to-text
+[revchatgpt]: https://img.shields.io/badge/RevChatGPT-2.3-brightgreen.svg?style=for-the-badge
+[revchatgpt-url]: https://github.com/acheong08/ChatGPT
+[speechrecog]: https://img.shields.io/badge/SpeechRecognition-3.9.0-brightgreen.svg?style=for-the-badge
+[speechrecog-url]: https://github.com/Uberi/speech_recognition
+[tts]: https://img.shields.io/badge/TTS-0.11.1-brightgreen.svg?style=for-the-badge
+[tts-url]: https://github.com/coqui-ai/TTS
+[whisper]: https://img.shields.io/badge/Whisper-20230124-brightgreen.svg?style=for-the-badge
+[whisper-url]: https://github.com/openai/whisper
+[pocketsphinx]: https://img.shields.io/badge/PocketSphinx-5.0.0-brightgreen.svg?style=for-the-badge
+[pocketsphinx-url]: https://github.com/cmusphinx/pocketsphinx
+[pytorch]: https://img.shields.io/static/v1?style=for-the-badge&message=PyTorch&color=EE4C2C&logo=PyTorch&logoColor=FFFFFF&label=
+[pytorch-url]: https://pytorch.org/get-started/locally/
+[witai]: https://img.shields.io/badge/Wit.Ai-brightgreen.svg?style=for-the-badge
+[witai-url]: https://github.com/wit-ai
