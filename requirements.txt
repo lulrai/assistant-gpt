@@ -2,7 +2,6 @@
 pyttsx3
 pyaudio
 python-dotenv
-SpeechRecognition
 # ------------------------------------------------------------
 # ==================== SPEECH RECOGNITION ====================
 # FOR POCKETSPHINX RECOGNITION:
