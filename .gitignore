@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 phone_number.json
 temp.wav
+test.py
