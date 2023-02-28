@@ -1,5 +1,6 @@
 """ Command to read the current time. """
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+import regex
 from commands.command import Command
 
 
@@ -18,12 +19,28 @@ class ReadTimeCommand(Command):
 
     def execute_intent_command(self, args) -> str:
         if args.get("timezone:timezone"):
-            timezone = args["timezone:timezone"][0]["body"]
-            print(self.__num_words_to_num(timezone))
-            current_time = datetime.now()
-            day_ordinal = self.ordinal(current_time.day)
-            greeting = self.greeting(current_time.hour)
-            time_string = current_time.strftime(f'{greeting}! It is %-I:%M %p on %A of %B {day_ordinal}, %Y')
+            timezone_regex = regex.compile(r"(UTC).*([+])+.*([0-2]*[0-9]).*(00|15|30|45)*", regex.IGNORECASE)
+            timezone_val = args["timezone:timezone"][0]["body"]
+            timezone_str = self.__num_words_to_num(timezone_val)
+            timezone_match = timezone_regex.match(timezone_str)
+            if timezone_match:
+                timezone_sign = timezone_match.group(2)
+                timezone_hour = int(timezone_match.group(3))
+                timezone_minute = int(timezone_match.group(4)) if timezone_match.group(4) else 0
+                if timezone_sign == "+":
+                    timezone_offset = timedelta(hours=timezone_hour, minutes=timezone_minute)
+                else:
+                    timezone_offset = -timedelta(hours=timezone_hour, minutes=timezone_minute)
+
+                timezone_val = timezone(timezone_offset)
+                current_time = datetime.now(timezone_val)
+                # convert the UTC datetime to the specified timezone
+                time_at_offset = current_time.astimezone(timezone_val)
+                day_ordinal = self.ordinal(time_at_offset.day)
+                greeting = self.greeting(time_at_offset.hour)
+                time_string = current_time.strftime(f'It is %-I:%M %p on %A of %B {day_ordinal}, %Y in %Z')
+            else:
+                time_string = "Sorry, I don't understand the timezone you specified."
         else:
             current_time = datetime.now()
             day_ordinal = self.ordinal(current_time.day)
