@@ -1,8 +1,6 @@
 """ Command Handler Module to handle commands. """
 import json
 import os
-import sys
-import threading
 import importlib
 from datetime import datetime
 from typing import Union
@@ -14,9 +12,8 @@ from utils.useful_funcs import bcolors
 
 class CommandHandler:
     """ This class initializes and handles commands. """
-    def __init__(self, tts_engine):
+    def __init__(self):
         self.commands = {}
-        self.tts_engine = tts_engine
         self.load_commands()
 
     def load_commands(self):
@@ -46,21 +43,21 @@ class CommandHandler:
                         print(f"{bcolors.OKBLUE}Loaded command {obj.__name__} with aliases {command_instance.command_aliases}.{bcolors.ENDC}")
         print(f"{bcolors.OKGREEN}Loaded {file_count} commands with {len(self.commands)} aliases.{bcolors.ENDC}\n")
 
-    def handle_command(self, command: Union[str, dict], timer_thread: threading.Thread) -> None:
+    def handle_command(self, command: Union[str, dict]) -> str:
         """
         Handles the command by executing the command if it exists, depending on the type of command.
         """
         # If the command is a dict, it is an intent command from wit.ai
         if isinstance(command, dict):
-            self.__handle_intent_command(command, timer_thread)
+            return self.__handle_intent_command(command)
         # If the command is a string, it is a string command
         elif isinstance(command, str):
-            self.__handle_string_command(command, timer_thread)
+            return self.__handle_string_command(command)
         # If the command is neither, raise a TypeError
         else:
             raise TypeError(f"Command must be a string or dict, not {type(command)}.")
 
-    def __handle_string_command(self, command: str, timer_thread: threading.Thread) -> str:
+    def __handle_string_command(self, command: str) -> str:
         """ Handles the command if it is a string. """
         command = command.lower()
         returned_response = ""
@@ -83,16 +80,12 @@ class CommandHandler:
         if returned_response == "":
             returned_response = "Sorry, command not found."
         print(f"{bcolors.HEADER}Response:{bcolors.ENDC} {bcolors.OKGREEN}{returned_response}{bcolors.ENDC}")
-        self.tts_engine.speak(returned_response)
-        if "goodbye" in returned_response.lower():
-            if timer_thread:
-                timer_thread.cancel()
-            sys.exit()
+        return returned_response
 
-    def __handle_intent_command(self, command_response: dict, timer_thread: threading.Thread) -> str:
+    def __handle_intent_command(self, command_response: dict) -> str:
         """ Handles the command if it is an intent command. """
         entities = command_response["entities"]
-        if command_response.get("intents"):
+        if not command_response.get("intents"):
             returned_response = ""
         else:
             intent = command_response["intents"][0]["name"]
@@ -107,12 +100,7 @@ class CommandHandler:
         if returned_response == "":
             returned_response = "Sorry, command not found."
         print(f"{bcolors.HEADER}Response:{bcolors.ENDC} {bcolors.OKGREEN}{returned_response}{bcolors.ENDC}")
-        self.tts_engine.speak(returned_response)
-        if "goodbye" in returned_response.lower():
-            if timer_thread:
-                timer_thread.cancel()
-            sys.exit()
-
+        return returned_response
 
     def learn_wit(self) -> bool:
         """ Learns wit.ai intents and utterances. """
