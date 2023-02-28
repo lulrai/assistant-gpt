@@ -150,49 +150,6 @@ class AudioData(object):
             end_byte = int((end_ms * self.sample_rate * self.sample_width) // 1000)
         return AudioData(self.frame_data[start_byte:end_byte], self.sample_rate, self.sample_width)
 
-    # def get_raw_data(self, convert_rate: int = None, convert_width: int = None):
-    #     """
-    #     Returns a byte string representing the raw frame data for the audio represented by the ``AudioData`` instance.
-
-    #     If ``convert_rate`` is specified and the audio sample rate is not ``convert_rate`` Hz, the resulting audio is resampled to match.
-
-    #     If ``convert_width`` is specified and the audio samples are not ``convert_width`` bytes each, the resulting audio is converted to match.
-
-    #     Writing these bytes directly to a file results in a valid `RAW/PCM audio file <https://en.wikipedia.org/wiki/Raw_audio_format>`__.
-    #     """
-    #     assert convert_rate is None or convert_rate > 0, "Sample rate to convert to must be a positive integer"
-    #     assert convert_width is None or (convert_width % 1 == 0 and 1 <= convert_width <= 4), "Sample width to convert to must be between 1 and 4 inclusive"
-
-    #     if convert_rate is None:
-    #         convert_rate = self.sample_rate
-    #     if convert_width is None:
-    #         convert_width = self.sample_width
-        
-    #     raw_data = self.frame_data
-    #     # make sure unsigned 8-bit audio (which uses unsigned samples) is handled like higher sample width audio (which uses signed samples)
-    #     if self.sample_width == 1:
-    #         raw_data = np.array(raw_data, dtype=np.int8) - 128  # subtract 128 from every sample to make them act like signed samples
-
-    #     # resample audio at the desired rate if specified
-    #     if self.sample_rate != convert_rate:
-    #         num_samples = int(len(raw_data) * convert_rate / self.sample_rate)
-    #         raw_data = signal.resample(raw_data, num_samples)
-
-    #     # convert samples to desired sample width if specified
-    #     if self.sample_width != convert_width:
-    #         if convert_width == 3:  # we're converting the audio into 24-bit (workaround for https://bugs.python.org/issue12866)
-    #             raw_data = raw_data.astype(np.int32)
-    #             raw_data = np.left_shift(raw_data, 8).astype(np.int32)
-    #             raw_data = np.right_shift(raw_data, 8).astype(np.int32)
-    #         else:
-    #             raw_data = raw_data.astype(f"int{convert_width*8}")
-
-    #     # if the output is 8-bit audio with unsigned samples, convert the samples we've been treating as signed to unsigned again
-    #     if convert_width == 1:
-    #         raw_data = raw_data.astype(np.int8) + 128
-
-    #     return raw_data.tobytes()
-    
     def get_raw_data(self, convert_rate: int = None, convert_width: int = None) -> bytes:
         """ Returns a byte string representing the raw frame data for the audio represented by the ``AudioData`` instance.
         
@@ -296,7 +253,7 @@ class AudioData(object):
         return flac_data
 
 
-class Recognizer(AudioSource):
+class Recognizer():
     """ Speech recognition functionality. """
     def __init__(self):
         """
@@ -478,7 +435,7 @@ class Recognizer(AudioSource):
         Raises a ``speech_recognition.UnknownValueError`` exception if the speech is unintelligible. Raises a ``speech_recognition.RequestError`` exception if there are any issues with the Sphinx installation.
         """
         assert isinstance(language, str) or (isinstance(language, tuple) and len(language) == 3), "``language`` must be a string or 3-tuple of Sphinx data file paths of the form ``(acoustic_parameters, language_model, phoneme_dictionary)``"
-        assert keyword_entries is None or all(isinstance(keyword, (type(""), type(u""))) and 0 <= sensitivity <= 1 for keyword, sensitivity in keyword_entries), "``keyword_entries`` must be ``None`` or a list of pairs of strings and numbers between 0 and 1"
+        assert keyword_entries is None or (isinstance(keyword, type("")) and 0 <= sensitivity <= 1 for keyword, sensitivity in keyword_entries), "``keyword_entries`` must be ``None`` or a list of pairs of strings and numbers between 0 and 1"
 
         # import the PocketSphinx speech recognition module
         try:
@@ -778,10 +735,11 @@ class PortableNamedTemporaryFile():
     """Limited replacement for ``tempfile.NamedTemporaryFile``, except unlike ``tempfile.NamedTemporaryFile``, the file can be opened again while it's currently open, even on Windows."""
     def __init__(self, mode="w+b"):
         self.mode = mode
+        self._file = None
+        self.name = None
 
     def __enter__(self):
         # create the temporary file and open it
-        import tempfile
         file_descriptor, file_path = tempfile.mkstemp()
         self._file = os.fdopen(file_descriptor, self.mode)
 
@@ -795,12 +753,15 @@ class PortableNamedTemporaryFile():
 
     def write(self, *args, **kwargs):
         """ ``write`` method for compatibility with ``wave.open`` """
+        assert self._file is not None, "Temporary file is not open"
         return self._file.write(*args, **kwargs)
 
     def writelines(self, *args, **kwargs):
         """ ``writelines`` method for compatibility with ``wave.open`` """
+        assert self._file is not None, "Temporary file is not open"
         return self._file.writelines(*args, **kwargs)
 
     def flush(self, *args, **kwargs):
         """ ``flush`` method for compatibility with ``wave.open`` """
+        assert self._file is not None, "Temporary file is not open"
         return self._file.flush(*args, **kwargs)

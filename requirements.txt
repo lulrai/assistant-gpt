@@ -1,6 +1,7 @@
 # ==================== CORE DEPENDENCIES ====================
 pyttsx3
-pyaudio
+sounddevice
+numpy
 python-dotenv
 # ------------------------------------------------------------
 # ==================== SPEECH RECOGNITION ====================
