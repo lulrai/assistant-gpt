@@ -1,7 +1,7 @@
 """ Text to speech engine for the project. """
 import time
 import pyttsx3
-import pyaudio
+import sounddevice as sd
 import numpy as np
 from TTS.api import TTS
 from utils.useful_funcs import silence, bcolors
@@ -13,6 +13,8 @@ class TextToSpeechEngine:
         self.tts_type: str = tts_type
         self.tts_rate: int = tts_rate
         self.tts_volume: int = tts_volume
+        self.device = sd.default.device[1]
+        self.channels = sd.query_devices(self.device)['max_output_channels'] # Set the number of channels
         print(f"{bcolors.HEADER}Initializing {self.tts_type.upper()} TTS engine...{bcolors.ENDC}")
         if self.tts_type == "ai":
             with silence():
@@ -30,23 +32,18 @@ class TextToSpeechEngine:
     def speak(self, text: str) -> None:
         """ Given a string, speak it out loud. """
         if self.tts_type == "ai":
-            p = pyaudio.PyAudio()
-            stream = p.open(format=pyaudio.paFloat32,
-                channels=1,
-                rate=22050,
-                frames_per_buffer=1024,
-                output=True,
-                output_device_index=2
-            )
+            stream = sd.OutputStream(device=self.device, samplerate=22050, blocksize=1024, dtype=np.float32, channels=self.channels)
+            stream.start()
             try:
                 with silence():
                     samples = self.tts.tts(text=text, speaker=self.tts.speakers[2])
                 samples = np.array(samples, dtype=np.float32)
                 total_time = len(samples) / 22050
-                stream.write(samples.tobytes())
+                samples = np.tile(samples, (self.channels, 1)).T
+                samples = np.ascontiguousarray(samples)
+                stream.write(samples)
             finally:
                 stream.close()
-                p.terminate()
         else:
             self.speaker = pyttsx3.init()
             try:
