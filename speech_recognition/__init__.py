@@ -13,7 +13,6 @@ import tempfile
 import sys
 import subprocess
 import wave
-import aifc
 import math
 import audioop
 import collections
@@ -21,24 +20,13 @@ import json
 import threading
 import platform
 import stat
-import time
-from distutils.version import LooseVersion
-from pprint import pprint
 import urllib.parse
-import pyaudio
 import requests
+import sounddevice as sd
+import numpy as np
 
 __author__ = "Nischal Neupane"
 __version__ = "1.0.0"
-
-# try:  # attempt to use the Python 2 modules
-#     from urllib import urlencode
-#     from urllib2 import Request, urlopen, URLError, HTTPError
-# except ImportError:  # use the Python 3 modules
-#     from urllib.parse import urlencode
-#     from urllib.request import Request, urlopen
-#     from urllib.error import URLError, HTTPError
-
 
 class WaitTimeoutError(Exception):
     """ Raised when a wait times out. """
@@ -72,276 +60,58 @@ class Microphone(AudioSource):
     """
     Creates a new ``Microphone`` instance, which represents a physical microphone on the computer. Subclass of ``AudioSource``.
 
-    This will throw an ``AttributeError`` if you don't have PyAudio 0.2.11 or later installed.
-
-    If ``device_index`` is unspecified or ``None``, the default microphone is used as the audio source. Otherwise, ``device_index`` should be the index of the device to use for audio input.
-
-    A device index is an integer between 0 and ``pyaudio.get_device_count() - 1`` (assume we have used ``import pyaudio`` beforehand) inclusive. It represents an audio device such as a microphone or speaker. See the `PyAudio documentation <http://people.csail.mit.edu/hubert/pyaudio/docs/>`__ for more details.
-
     The microphone audio is recorded in chunks of ``chunk_size`` samples, at a rate of ``sample_rate`` samples per second (Hertz). If not specified, the value of ``sample_rate`` is determined automatically from the system's microphone settings.
 
     Higher ``sample_rate`` values result in better audio quality, but also more bandwidth (and therefore, slower recognition). Additionally, some CPUs, such as those in older Raspberry Pi models, can't keep up if this value is too high.
 
     Higher ``chunk_size`` values help avoid triggering on rapidly changing ambient noise, but also makes detection less sensitive. This value, generally, should be left at its default.
     """
-    def __init__(self, device_index=None, sample_rate=None, chunk_size=1024, channels=1):
-        assert device_index is None or isinstance(device_index, int), "Device index must be None or an integer"
+    def __init__(self, device=None, sample_rate=None, chunk_size=1024, channels=1):
+        assert device is None or isinstance(device, int), "Device index must be None or an integer"
         assert sample_rate is None or (isinstance(sample_rate, int) and sample_rate > 0), "Sample rate must be None or a positive integer"
         assert isinstance(chunk_size, int) and chunk_size > 0, "Chunk size must be a positive integer"
         assert isinstance(channels, int) and channels > 0 and channels < 100, "Channels must be a positive integer between 1 and 99"
 
-        # set up PyAudio
-        self.pyaudio_module = self.get_pyaudio()
-        audio = self.pyaudio_module.PyAudio()
-        try:
-            count = audio.get_device_count()  # obtain device count
-            if device_index is not None:  # ensure device index is in range
-                assert 0 <= device_index < count, f"Device index out of range ({count} devices available; device index should be between 0 and {count-1} inclusive)"
-            if sample_rate is None:  # automatically set the sample rate to the hardware's default sample rate if not specified
-                device_info = audio.get_device_info_by_index(device_index) if device_index is not None else audio.get_default_input_device_info()
-                assert isinstance(device_info.get("defaultSampleRate"), (float, int)) and device_info["defaultSampleRate"] > 0, f"Invalid device info returned from PyAudio: {device_info}"
-                sample_rate = int(device_info["defaultSampleRate"])
-        finally:
-            audio.terminate()
-
-        self.device_index = device_index
-        self.format = self.pyaudio_module.paInt16  # 16-bit int sampling
-        self.SAMPLE_WIDTH = self.pyaudio_module.get_sample_size(self.format)  # size of each sample
-        self.SAMPLE_RATE = sample_rate  # sampling rate in Hertz
+        self.device = device if device is not None else sd.default.device[0]
+        self.format = np.int16 # 16-bit int sampling
+        self.SAMPLE_WIDTH = np.dtype(self.format).itemsize # 16-bit int sampling
+        self.SAMPLE_RATE = sample_rate or sd.query_devices(self.device)["default_samplerate"]
         self.CHUNK = chunk_size  # number of frames stored in each buffer
         self.CHANNELS = channels  # number of channels
 
-        self.audio = None
         self.stream = None
 
-    @staticmethod
-    def get_pyaudio():
-        """
-        Imports the pyaudio module and checks its version. Throws exceptions if pyaudio can't be found or a wrong version is installed
-        """
-        if LooseVersion(pyaudio.__version__) < LooseVersion("0.2.11"):
-            raise AttributeError(f"PyAudio 0.2.11 or later is required (found version {pyaudio.__version__})")
-        return pyaudio
+    def __enter__(self):
+        self.stream = sd.InputStream(device=self.device, samplerate=self.SAMPLE_RATE, channels=self.CHANNELS, blocksize=self.CHUNK, dtype=self.format)
+        self.stream.start()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stream.stop()
 
     @staticmethod
     def list_microphone_names():
         """
         Returns a list of the names of all available microphones. For microphones where the name can't be retrieved, the list entry contains ``None`` instead.
 
-        The index of each microphone's name in the returned list is the same as its device index when creating a ``Microphone`` instance - if you want to use the microphone at index 3 in the returned list, use ``Microphone(device_index=3)``.
+        The index of each microphone's name in the returned list is the same as its device index when creating a ``Microphone`` instance - if you want to use the microphone at index 3 in the returned list, use ``Microphone(device=3)``.
         """
-        audio = Microphone.get_pyaudio().PyAudio()
-        try:
-            result = []
-            for i in range(audio.get_device_count()):
-                device_info = audio.get_device_info_by_index(i)
-                result.append(device_info.get("name"))
-        finally:
-            audio.terminate()
-        return result
+        return [device['name'] for device in sd.query_devices() if device['max_input_channels'] > 0]
 
     @staticmethod
     def list_working_microphones():
         """
-        Returns a dictionary mapping device indices to microphone names, for microphones that are currently hearing sounds. When using this function, ensure that your microphone is unmuted and make some noise at it to ensure it will be detected as working.
-
-        Each key in the returned dictionary can be passed to the ``Microphone`` constructor to use that microphone. For example, if the return value is ``{3: "HDA Intel PCH: ALC3232 Analog (hw:1,0)"}``, you can do ``Microphone(device_index=3)`` to use that microphone.
+        Returns a dictionary mapping device indices to microphone names, for microphones that are currently hearing sounds. When using this function, ensure that your microphone...
         """
-        pyaudio_module = Microphone.get_pyaudio()
-        audio = pyaudio_module.PyAudio()
-        try:
-            result = {}
-            for device_index in range(audio.get_device_count()):
-                device_info = audio.get_device_info_by_index(device_index)
-                device_name = device_info.get("name")
-                assert isinstance(device_info.get("defaultSampleRate"), (float, int)) and device_info["defaultSampleRate"] > 0, f"Invalid device info returned from PyAudio: {device_info}"
+        working_microphones = {}
+        for device in sd.query_devices():
+            if device['max_input_channels'] > 0:
                 try:
-                    # read audio
-                    pyaudio_stream = audio.open(
-                        input_device_index=device_index, channels=1, format=pyaudio_module.paInt16,
-                        rate=int(device_info["defaultSampleRate"]), input=True
-                    )
-                    try:
-                        buffer = pyaudio_stream.read(1024)
-                        if not pyaudio_stream.is_stopped():
-                            pyaudio_stream.stop_stream()
-                    finally:
-                        pyaudio_stream.close()
+                    with sd.InputStream(device=device['name'], channels=1):
+                        working_microphones[device['name']] = device['name']
                 except Exception: # pylint: disable=broad-except
-                    continue
-
-                # compute RMS of debiased audio
-                energy = -audioop.rms(buffer, 2)
-                energy_bytes = chr(energy & 0xFF) + chr((energy >> 8) & 0xFF) if bytes is str else bytes([energy & 0xFF, (energy >> 8) & 0xFF])  # Python 2 compatibility
-                debiased_energy = audioop.rms(audioop.add(buffer, energy_bytes * (len(buffer) // 2), 2), 2)
-
-                if debiased_energy > 30:  # probably actually audio
-                    result[device_index] = device_name
-        finally:
-            audio.terminate()
-        return result
-
-    def __enter__(self):
-        assert self.stream is None, "This audio source is already inside a context manager"
-        self.audio = self.pyaudio_module.PyAudio()
-        try:
-            self.stream = Microphone.MicrophoneStream(
-                self.audio.open(
-                    input_device_index=self.device_index, channels=self.CHANNELS, format=self.format,
-                    rate=self.SAMPLE_RATE, frames_per_buffer=self.CHUNK, input=True,
-                )
-            )
-        except Exception:  # pylint: disable=broad-except
-            self.audio.terminate()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        try:
-            self.stream.close()
-        finally:
-            self.stream = None
-            self.audio.terminate()
-
-    class MicrophoneStream(object):
-        """ Opens a recording stream as a generator yielding the audio chunks. """
-        def __init__(self, pyaudio_stream):
-            self.pyaudio_stream = pyaudio_stream
-
-        def read(self, size):
-            """ Reads ``size`` bytes of data from the stream. """
-            return self.pyaudio_stream.read(size, exception_on_overflow=False)
-
-        def close(self):
-            """ Closes the stream. """
-            try:
-                # sometimes, if the stream isn't stopped, closing the stream throws an exception
-                if not self.pyaudio_stream.is_stopped():
-                    self.pyaudio_stream.stop_stream()
-            finally:
-                self.pyaudio_stream.close()
-
-
-class AudioFile(AudioSource):
-    """
-    Creates a new ``AudioFile`` instance given a WAV/AIFF/FLAC audio file ``filename_or_fileobject``. Subclass of ``AudioSource``.
-
-    If ``filename_or_fileobject`` is a string, then it is interpreted as a path to an audio file on the filesystem. Otherwise, ``filename_or_fileobject`` should be a file-like object such as ``io.BytesIO`` or similar.
-
-    Note that functions that read from the audio (such as ``recognizer_instance.record`` or ``recognizer_instance.listen``) will move ahead in the stream. For example, if you execute ``recognizer_instance.record(audiofile_instance, duration=10)`` twice, the first time it will return the first 10 seconds of audio, and the second time it will return the 10 seconds of audio right after that. This is always reset to the beginning when entering an ``AudioFile`` context.
-
-    WAV files must be in PCM/LPCM format; WAVE_FORMAT_EXTENSIBLE and compressed WAV are not supported and may result in undefined behaviour.
-
-    Both AIFF and AIFF-C (compressed AIFF) formats are supported.
-
-    FLAC files must be in native FLAC format; OGG-FLAC is not supported and may result in undefined behaviour.
-    """
-
-    def __init__(self, filename_or_fileobject):
-        assert isinstance(filename_or_fileobject, (type(""), type(""))) or hasattr(filename_or_fileobject, "read"), "Given audio file must be a filename string or a file-like object"
-        self.filename_or_fileobject = filename_or_fileobject
-        self.stream = None
-        self.DURATION = None
-
-        self.audio_reader = None
-        self.little_endian = False
-        self.SAMPLE_RATE = None
-        self.CHUNK = None
-        self.FRAME_COUNT = None
-        self.SAMPLE_WIDTH = None
-
-    def __enter__(self):
-        assert self.stream is None, "This audio source is already inside a context manager"
-        try:
-            # attempt to read the file as WAV
-            self.audio_reader = wave.open(self.filename_or_fileobject, "rb")
-            self.little_endian = True  # RIFF WAV is a little-endian format (most ``audioop`` operations assume that the frames are stored in little-endian form)
-        except (wave.Error, EOFError):
-            try:
-                # attempt to read the file as AIFF
-                self.audio_reader = aifc.open(self.filename_or_fileobject, "rb")
-                self.little_endian = False  # AIFF is a big-endian format
-            except (aifc.Error, EOFError):
-                # attempt to read the file as FLAC
-                if hasattr(self.filename_or_fileobject, "read"):
-                    flac_data = self.filename_or_fileobject.read()
-                else:
-                    with open(self.filename_or_fileobject, "rb") as f:
-                        flac_data = f.read()
-
-                # run the FLAC converter with the FLAC data to get the AIFF data
-                flac_converter = get_flac_converter()
-                if os.name == "nt":  # on Windows, specify that the process is to be started without showing a console window
-                    startup_info = subprocess.STARTUPINFO()
-                    startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # specify that the wShowWindow field of `startup_info` contains a value
-                    startup_info.wShowWindow = subprocess.SW_HIDE  # specify that the console window should be hidden
-                else:
-                    startup_info = None  # default startupinfo
-                process = subprocess.Popen([
-                    flac_converter,
-                    "--stdout", "--totally-silent",  # put the resulting AIFF file in stdout, and make sure it's not mixed with any program output
-                    "--decode", "--force-aiff-format",  # decode the FLAC file into an AIFF file
-                    "-",  # the input FLAC file contents will be given in stdin
-                ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, startupinfo=startup_info)
-                aiff_data, _ = process.communicate(flac_data)
-                aiff_file = io.BytesIO(aiff_data)
-                try:
-                    self.audio_reader = aifc.open(aiff_file, "rb")
-                except (aifc.Error, EOFError) as exc:
-                    raise ValueError('Audio file could not be read as PCM WAV, AIFF/AIFF-C, or Native FLAC; check if file is corrupted or in another format') from exc
-                self.little_endian = False  # AIFF is a big-endian format
-        assert 1 <= self.audio_reader.getnchannels() <= 2, "Audio must be mono or stereo"
-        self.SAMPLE_WIDTH = self.audio_reader.getsampwidth()
-
-        # 24-bit audio needs some special handling for old Python versions (workaround for https://bugs.python.org/issue12866)
-        samples_24_bit_pretending_to_be_32_bit = False
-        if self.SAMPLE_WIDTH == 3:  # 24-bit audio
-            try:
-                audioop.bias(b"", self.SAMPLE_WIDTH, 0)  # test whether this sample width is supported (for example, ``audioop`` in Python 3.3 and below don't support sample width 3, while Python 3.4+ do)
-            except audioop.error:  # this version of audioop doesn't support 24-bit audio (probably Python 3.3 or less)
-                samples_24_bit_pretending_to_be_32_bit = True  # while the ``AudioFile`` instance will outwardly appear to be 32-bit, it will actually internally be 24-bit
-                self.SAMPLE_WIDTH = 4  # the ``AudioFile`` instance should present itself as a 32-bit stream now, since we'll be converting into 32-bit on the fly when reading
-
-        self.SAMPLE_RATE = self.audio_reader.getframerate()
-        self.CHUNK = 4096
-        self.FRAME_COUNT = self.audio_reader.getnframes()
-        self.DURATION = self.FRAME_COUNT / float(self.SAMPLE_RATE)
-        self.stream = AudioFile.AudioFileStream(self.audio_reader, self.little_endian, samples_24_bit_pretending_to_be_32_bit)
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if not hasattr(self.filename_or_fileobject, "read"):  # only close the file if it was opened by this class in the first place (if the file was originally given as a path)
-            self.audio_reader.close()
-        self.stream = None
-        self.DURATION = None
-
-    class AudioFileStream(object):
-        """ A file-like object that reads from an audio file. """
-        def __init__(self, audio_reader, little_endian, samples_24_bit_pretending_to_be_32_bit):
-            self.audio_reader = audio_reader  # an audio file object (e.g., a `wave.Wave_read` instance)
-            self.little_endian = little_endian  # whether the audio data is little-endian (when working with big-endian things, we'll have to convert it to little-endian before we process it)
-            self.samples_24_bit_pretending_to_be_32_bit = samples_24_bit_pretending_to_be_32_bit  # this is true if the audio is 24-bit audio, but 24-bit audio isn't supported, so we have to pretend that this is 32-bit audio and convert it on the fly
-
-        def read(self, size=-1):
-            """ Read the given number of bytes from the audio file. """
-            buffer = self.audio_reader.readframes(self.audio_reader.getnframes() if size == -1 else size)
-            if not isinstance(buffer, bytes):
-                buffer = b""  # workaround for https://bugs.python.org/issue24608
-
-            sample_width = self.audio_reader.getsampwidth()
-            if not self.little_endian:  # big endian format, convert to little endian on the fly
-                if hasattr(audioop, "byteswap"):  # ``audioop.byteswap`` was only added in Python 3.4 (incidentally, that also means that we don't need to worry about 24-bit audio being unsupported, since Python 3.4+ always has that functionality)
-                    buffer = audioop.byteswap(buffer, sample_width)
-                else:  # manually reverse the bytes of each sample, which is slower but works well enough as a fallback
-                    buffer = buffer[sample_width - 1::-1] + b"".join(buffer[i + sample_width:i:-1] for i in range(sample_width - 1, len(buffer), sample_width))
-
-            # workaround for https://bugs.python.org/issue12866
-            if self.samples_24_bit_pretending_to_be_32_bit:  # we need to convert samples from 24-bit to 32-bit before we can process them with ``audioop`` functions
-                buffer = b"".join(b"\x00" + buffer[i:i + sample_width] for i in range(0, len(buffer), sample_width))  # since we're in little endian, we prepend a zero byte to each 24-bit sample to get a 32-bit sample
-                sample_width = 4  # make sure we thread the buffer as 32-bit audio now, after converting it from 24-bit audio
-            if self.audio_reader.getnchannels() != 1:  # stereo audio
-                buffer = audioop.tomono(buffer, sample_width, 1, 1)  # convert stereo audio data to mono
-            return buffer
-
+                    pass
+        return working_microphones
 
 class AudioData(object):
     """
@@ -355,14 +125,14 @@ class AudioData(object):
 
     Usually, instances of this class are obtained from ``recognizer_instance.record`` or ``recognizer_instance.listen``, or in the callback for ``recognizer_instance.listen_in_background``, rather than instantiating them directly.
     """
-    def __init__(self, frame_data, sample_rate, sample_width):
+    def __init__(self, frame_data: bytes, sample_rate: int, sample_width: int):
         assert sample_rate > 0, "Sample rate must be a positive integer"
         assert sample_width % 1 == 0 and 1 <= sample_width <= 4, "Sample width must be between 1 and 4 inclusive"
         self.frame_data = frame_data
-        self.sample_rate = sample_rate
+        self.sample_rate = int(sample_rate)
         self.sample_width = int(sample_width)
 
-    def get_segment(self, start_ms=None, end_ms=None):
+    def get_segment(self, start_ms: int = None, end_ms: int = None):
         """
         Returns a new ``AudioData`` instance, trimmed to a given time interval. In other words, an ``AudioData`` instance with the same audio data except starting at ``start_ms`` milliseconds in and ending ``end_ms`` milliseconds in.
 
@@ -380,14 +150,55 @@ class AudioData(object):
             end_byte = int((end_ms * self.sample_rate * self.sample_width) // 1000)
         return AudioData(self.frame_data[start_byte:end_byte], self.sample_rate, self.sample_width)
 
-    def get_raw_data(self, convert_rate=None, convert_width=None):
-        """
-        Returns a byte string representing the raw frame data for the audio represented by the ``AudioData`` instance.
+    # def get_raw_data(self, convert_rate: int = None, convert_width: int = None):
+    #     """
+    #     Returns a byte string representing the raw frame data for the audio represented by the ``AudioData`` instance.
 
+    #     If ``convert_rate`` is specified and the audio sample rate is not ``convert_rate`` Hz, the resulting audio is resampled to match.
+
+    #     If ``convert_width`` is specified and the audio samples are not ``convert_width`` bytes each, the resulting audio is converted to match.
+
+    #     Writing these bytes directly to a file results in a valid `RAW/PCM audio file <https://en.wikipedia.org/wiki/Raw_audio_format>`__.
+    #     """
+    #     assert convert_rate is None or convert_rate > 0, "Sample rate to convert to must be a positive integer"
+    #     assert convert_width is None or (convert_width % 1 == 0 and 1 <= convert_width <= 4), "Sample width to convert to must be between 1 and 4 inclusive"
+
+    #     if convert_rate is None:
+    #         convert_rate = self.sample_rate
+    #     if convert_width is None:
+    #         convert_width = self.sample_width
+        
+    #     raw_data = self.frame_data
+    #     # make sure unsigned 8-bit audio (which uses unsigned samples) is handled like higher sample width audio (which uses signed samples)
+    #     if self.sample_width == 1:
+    #         raw_data = np.array(raw_data, dtype=np.int8) - 128  # subtract 128 from every sample to make them act like signed samples
+
+    #     # resample audio at the desired rate if specified
+    #     if self.sample_rate != convert_rate:
+    #         num_samples = int(len(raw_data) * convert_rate / self.sample_rate)
+    #         raw_data = signal.resample(raw_data, num_samples)
+
+    #     # convert samples to desired sample width if specified
+    #     if self.sample_width != convert_width:
+    #         if convert_width == 3:  # we're converting the audio into 24-bit (workaround for https://bugs.python.org/issue12866)
+    #             raw_data = raw_data.astype(np.int32)
+    #             raw_data = np.left_shift(raw_data, 8).astype(np.int32)
+    #             raw_data = np.right_shift(raw_data, 8).astype(np.int32)
+    #         else:
+    #             raw_data = raw_data.astype(f"int{convert_width*8}")
+
+    #     # if the output is 8-bit audio with unsigned samples, convert the samples we've been treating as signed to unsigned again
+    #     if convert_width == 1:
+    #         raw_data = raw_data.astype(np.int8) + 128
+
+    #     return raw_data.tobytes()
+    
+    def get_raw_data(self, convert_rate: int = None, convert_width: int = None) -> bytes:
+        """ Returns a byte string representing the raw frame data for the audio represented by the ``AudioData`` instance.
+        
         If ``convert_rate`` is specified and the audio sample rate is not ``convert_rate`` Hz, the resulting audio is resampled to match.
-
         If ``convert_width`` is specified and the audio samples are not ``convert_width`` bytes each, the resulting audio is converted to match.
-
+        
         Writing these bytes directly to a file results in a valid `RAW/PCM audio file <https://en.wikipedia.org/wiki/Raw_audio_format>`__.
         """
         assert convert_rate is None or convert_rate > 0, "Sample rate to convert to must be a positive integer"
@@ -422,7 +233,7 @@ class AudioData(object):
 
         return raw_data
 
-    def get_wav_data(self, convert_rate=None, convert_width=None):
+    def get_wav_data(self, convert_rate: int = None, convert_width: int = None) -> bytes:
         """
         Returns a byte string representing the contents of a WAV file containing the audio represented by the ``AudioData`` instance.
 
@@ -449,40 +260,7 @@ class AudioData(object):
                 wav_writer.close()
         return wav_data
 
-    def get_aiff_data(self, convert_rate=None, convert_width=None):
-        """
-        Returns a byte string representing the contents of an AIFF-C file containing the audio represented by the ``AudioData`` instance.
-
-        If ``convert_width`` is specified and the audio samples are not ``convert_width`` bytes each, the resulting audio is converted to match.
-
-        If ``convert_rate`` is specified and the audio sample rate is not ``convert_rate`` Hz, the resulting audio is resampled to match.
-
-        Writing these bytes directly to a file results in a valid `AIFF-C file <https://en.wikipedia.org/wiki/Audio_Interchange_File_Format>`__.
-        """
-        raw_data = self.get_raw_data(convert_rate, convert_width)
-        sample_rate = self.sample_rate if convert_rate is None else convert_rate
-        sample_width = self.sample_width if convert_width is None else convert_width
-
-        # the AIFF format is big-endian, so we need to convert the little-endian raw data to big-endian
-        if hasattr(audioop, "byteswap"):  # ``audioop.byteswap`` was only added in Python 3.4
-            raw_data = audioop.byteswap(raw_data, sample_width)
-        else:  # manually reverse the bytes of each sample, which is slower but works well enough as a fallback
-            raw_data = raw_data[sample_width - 1::-1] + b"".join(raw_data[i + sample_width:i:-1] for i in range(sample_width - 1, len(raw_data), sample_width))
-
-        # generate the AIFF-C file contents
-        with io.BytesIO() as aiff_file:
-            aiff_writer = aifc.open(aiff_file, "wb")
-            try:  # note that we can't use context manager, since that was only added in Python 3.4
-                aiff_writer.setframerate(sample_rate)
-                aiff_writer.setsampwidth(sample_width)
-                aiff_writer.setnchannels(1)
-                aiff_writer.writeframes(raw_data)
-                aiff_data = aiff_file.getvalue()
-            finally:  # make sure resources are cleaned up
-                aiff_writer.close()
-        return aiff_data
-
-    def get_flac_data(self, convert_rate=None, convert_width=None):
+    def get_flac_data(self, convert_rate: int = None, convert_width: int = None) -> bytes:
         """
         Returns a byte string representing the contents of a FLAC file containing the audio represented by the ``AudioData`` instance.
 
@@ -536,42 +314,7 @@ class Recognizer(AudioSource):
         self.whisper_model = None  # path to the whisper model to use for speech recognition, or ``None`` to use the default model
         self.sphinx_decoder = None  # Sphinx decoder object to use for speech recognition, or ``None`` to use the default decoder
 
-    def record(self, source, duration=None, offset=None):
-        """
-        Records up to ``duration`` seconds of audio from ``source`` (an ``AudioSource`` instance) starting at ``offset`` (or at the beginning if not specified) into an ``AudioData`` instance, which it returns.
-
-        If ``duration`` is not specified, then it will record until there is no more audio input.
-        """
-        assert isinstance(source, AudioSource), "Source must be an audio source"
-        assert source.stream is not None, "Audio source must be entered before recording, see documentation for ``AudioSource``; are you using ``source`` outside of a ``with`` statement?"
-
-        frames = io.BytesIO()
-        seconds_per_buffer = (source.CHUNK + 0.0) / source.SAMPLE_RATE
-        elapsed_time = 0
-        offset_time = 0
-        offset_reached = False
-        while True:  # loop for the total number of chunks needed
-            if offset and not offset_reached:
-                offset_time += seconds_per_buffer
-                if offset_time > offset:
-                    offset_reached = True
-
-            buffer = source.stream.read(source.CHUNK)
-            if len(buffer) == 0:
-                break
-
-            if offset_reached or not offset:
-                elapsed_time += seconds_per_buffer
-                if duration and elapsed_time > duration:
-                    break
-
-                frames.write(buffer)
-
-        frame_data = frames.getvalue()
-        frames.close()
-        return AudioData(frame_data, source.SAMPLE_RATE, source.SAMPLE_WIDTH)
-
-    def adjust_for_ambient_noise(self, source, duration=1):
+    def adjust_for_ambient_noise(self, source: Microphone, duration: int = 1):
         """
         Adjusts the energy threshold dynamically using audio from ``source`` (an ``AudioSource`` instance) to account for ambient noise.
 
@@ -591,7 +334,7 @@ class Recognizer(AudioSource):
             elapsed_time += seconds_per_buffer
             if elapsed_time > duration:
                 break
-            buffer = source.stream.read(source.CHUNK)
+            buffer: bytes = source.stream.read(source.CHUNK)[0].flatten().tobytes()
             energy = audioop.rms(buffer, source.SAMPLE_WIDTH)  # energy of the audio signal
 
             # dynamically adjust the energy threshold using asymmetric weighted average
@@ -599,7 +342,7 @@ class Recognizer(AudioSource):
             target_energy = energy * self.dynamic_energy_ratio
             self.energy_threshold = self.energy_threshold * damping + target_energy * (1 - damping)
 
-    def listen(self, source, timeout=None, phrase_time_limit=None):
+    def listen(self, source: Microphone, timeout: int = None, phrase_time_limit: int = None):
         """
         Records a single phrase from ``source`` (an ``AudioSource`` instance) into an ``AudioData`` instance, which it returns.
 
@@ -623,7 +366,7 @@ class Recognizer(AudioSource):
 
         # read audio input for phrases until there is a phrase that is long enough
         elapsed_time = 0  # number of seconds of audio read
-        buffer = b""  # an empty buffer means that the stream has ended and there is no data left to read
+        buffer: bytes = b''  # an empty buffer means that the stream has ended and there is no data left to read
         while True:
             frames = collections.deque()
             # store audio input until the phrase starts
@@ -633,7 +376,7 @@ class Recognizer(AudioSource):
                 if timeout and elapsed_time > timeout:
                     raise WaitTimeoutError("listening timed out while waiting for phrase to start")
 
-                buffer = source.stream.read(source.CHUNK)
+                buffer = source.stream.read(source.CHUNK)[0].flatten().tobytes()
                 if len(buffer) == 0:
                     break  # reached end of the stream
                 frames.append(buffer)
@@ -660,7 +403,7 @@ class Recognizer(AudioSource):
                 if phrase_time_limit and elapsed_time - phrase_start_time > phrase_time_limit:
                     break
 
-                buffer = source.stream.read(source.CHUNK)
+                buffer = source.stream.read(source.CHUNK)[0].flatten().tobytes()
                 if len(buffer) == 0:
                     break  # reached end of the stream
                 frames.append(buffer)
