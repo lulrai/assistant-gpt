@@ -32,7 +32,7 @@
       <img src="resources/images/logo_dark.png" />
   </picture>
 
-  <h3 align="center"></h3>
+  <h3 align="center">AssistantGPT</h3>
 
   <p align="center">
     A fun speech-to-text and text-to-speech based assistant for your needs.
